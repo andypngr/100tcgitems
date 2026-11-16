@@ -46,7 +46,7 @@
 </div>
 
 <script>
-  // PASTE YOUR PUBLISHED CSV URL HERE
+  // Google Sheet published CSV
   const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQC0oTQEVVzoNRYrTdZ4LU3yRZZCQugnVwj0_sUUJcUDw4l_DbncBWdWIWZxLvRT5b9j5l_9a0LfA2V/pub?gid=866828695&single=true&output=csv';
 
   async function loadProducts() {
@@ -58,13 +58,14 @@
       const ticker = document.getElementById('ticker');
       let html = '';
 
-      rows.forEach(row => {
+      rows.forEach((row, index) => {
         const cols = row.split(',');
         // Column C = index 2, Column H = index 7
         const name = cols[2]?.replace(/"/g, '').trim() || '';
         const price = cols[7]?.replace(/"/g, '').trim() || '';
+        const lineNumber = index + 1; // starts at 1
         if (name) {
-          html += `<div class="item">${name}${price ? `<span class="price">${price}</span>` : ''}</div>`;
+          html += `<div class="item">${lineNumber}. ${name}${price ? `<span class="price">${price}</span>` : ''}</div>`;
         }
       });
 
