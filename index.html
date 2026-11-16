@@ -1,6 +1,4 @@
-Updated so that if **column I** says "sold out", it shows **sold out** in red instead of the price:
-
-```html
+Comment ! followed by number for link to purchase. Example: !20
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -105,7 +103,7 @@ Updated so that if **column I** says "sold out", it shows **sold out** in red in
         const name = cols[2]?.trim() || '';
         const price = cols[7]?.trim() || '';
         const status = (cols[8]?.trim() || '').toLowerCase();
-        const lineNumber = index + 1;
+        const lineNumber = index + 2; // start at 2 (header is line 1)
 
         if (name) {
           let extra = '';
@@ -129,6 +127,3 @@ Updated so that if **column I** says "sold out", it shows **sold out** in red in
 </script>
 </body>
 </html>
-```
-
-If column I contains “sold out” (case-insensitive), it shows **sold out** in red. Otherwise it shows the price from column H in green.
