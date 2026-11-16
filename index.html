@@ -1,3 +1,6 @@
+Updated so that if **column I** says "sold out", it shows **sold out** in red instead of the price:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,6 +44,11 @@
     color: #4ade80;
     margin-left: 8px;
   }
+  .item span.soldout {
+    color: #ef4444;
+    margin-left: 8px;
+    text-transform: uppercase;
+  }
   @keyframes scroll {
     0% { transform: translateY(0); }
     100% { transform: translateY(-50%); }
@@ -68,7 +76,7 @@
 
       if (char === '"' && inQuotes && nextChar === '"') {
         current += '"';
-        i++; // skip escaped quote
+        i++;
       } else if (char === '"') {
         inQuotes = !inQuotes;
       } else if (char === ',' && !inQuotes) {
@@ -93,12 +101,20 @@
 
       rows.forEach((row, index) => {
         const cols = parseCSVRow(row);
-        // Column C = index 2, Column H = index 7
+        // Column C = index 2, Column H = index 7, Column I = index 8
         const name = cols[2]?.trim() || '';
         const price = cols[7]?.trim() || '';
+        const status = (cols[8]?.trim() || '').toLowerCase();
         const lineNumber = index + 1;
+
         if (name) {
-          html += `<div class="item">${lineNumber}. ${name}${price ? `<span class="price">${price}</span>` : ''}</div>`;
+          let extra = '';
+          if (status === 'sold out') {
+            extra = `<span class="soldout">sold out</span>`;
+          } else if (price) {
+            extra = `<span class="price">${price}</span>`;
+          }
+          html += `<div class="item">${lineNumber}. ${name}${extra}</div>`;
         }
       });
 
@@ -113,3 +129,6 @@
 </script>
 </body>
 </html>
+```
+
+If column I contains “sold out” (case-insensitive), it shows **sold out** in red. Otherwise it shows the price from column H in green.
