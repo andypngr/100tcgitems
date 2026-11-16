@@ -56,6 +56,32 @@
   // Google Sheet published CSV
   const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQC0oTQEVVzoNRYrTdZ4LU3yRZZCQugnVwj0_sUUJcUDw4l_DbncBWdWIWZxLvRT5b9j5l_9a0LfA2V/pub?gid=866828695&single=true&output=csv';
 
+  // Proper CSV row parser that handles quoted commas
+  function parseCSVRow(row) {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < row.length; i++) {
+      const char = row[i];
+      const nextChar = row[i + 1];
+
+      if (char === '"' && inQuotes && nextChar === '"') {
+        current += '"';
+        i++; // skip escaped quote
+      } else if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === ',' && !inQuotes) {
+        result.push(current);
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    result.push(current);
+    return result;
+  }
+
   async function loadProducts() {
     try {
       const res = await fetch(CSV_URL);
@@ -66,17 +92,16 @@
       let html = '';
 
       rows.forEach((row, index) => {
-        const cols = row.split(',');
+        const cols = parseCSVRow(row);
         // Column C = index 2, Column H = index 7
-        const name = cols[2]?.replace(/"/g, '').trim() || '';
-        const price = cols[7]?.replace(/"/g, '').trim() || '';
-        const lineNumber = index + 1; // starts at 1
+        const name = cols[2]?.trim() || '';
+        const price = cols[7]?.trim() || '';
+        const lineNumber = index + 1;
         if (name) {
           html += `<div class="item">${lineNumber}. ${name}${price ? `<span class="price">${price}</span>` : ''}</div>`;
         }
       });
 
-      // Duplicate for seamless loop
       ticker.innerHTML = html + html;
     } catch (e) {
       document.getElementById('ticker').innerHTML = '<div class="item">Error loading products</div>';
@@ -84,16 +109,7 @@
   }
 
   loadProducts();
-  // Refresh every 2 minutes
   setInterval(loadProducts, 120000);
 </script>
 </body>
 </html>
-```
-
-### What changed
-- Everything is explicitly `width: 100%`
-- Removed `white-space: nowrap` so text wraps instead of overflowing when the browser gets narrow
-- Added `word-break` and `overflow-wrap` so long card names adapt cleanly
-
-It will now shrink and reflow with the browser/embed width.
