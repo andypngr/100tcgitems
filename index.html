@@ -42,9 +42,14 @@ Comment ! followed by number for link to purchase. Example: !20
     color: #4ade80;
     margin-left: 8px;
   }
-  .item span.soldout {
+  .item span.soldout-price {
     color: #ef4444;
     margin-left: 8px;
+    text-decoration: line-through;
+  }
+  .item span.soldout {
+    color: #ef4444;
+    margin-left: 4px;
     text-transform: uppercase;
   }
   @keyframes scroll {
@@ -108,7 +113,7 @@ Comment ! followed by number for link to purchase. Example: !20
         if (name) {
           let extra = '';
           if (status === 'sold out') {
-            extra = `<span class="soldout">sold out</span>`;
+            extra = `<span class="soldout-price">${price}</span><span class="soldout">sold out</span>`;
           } else if (price) {
             extra = `<span class="price">${price}</span>`;
           }
