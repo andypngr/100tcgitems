@@ -1,4 +1,3 @@
-Comment ! followed by number for link to purchase. Example: !20
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,6 +12,21 @@ Comment ! followed by number for link to purchase. Example: !20
     font-family: Arial, sans-serif;
     overflow: hidden;
   }
+  .info-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(0,0,0,0.85);
+    color: white;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 6px 12px;
+    text-align: center;
+    z-index: 10;
+    box-sizing: border-box;
+    letter-spacing: 0.5px;
+  }
   .ticker-wrap {
     width: 100%;
     height: 100%;
@@ -21,6 +35,7 @@ Comment ! followed by number for link to purchase. Example: !20
     overflow: hidden;
     position: relative;
     box-sizing: border-box;
+    padding-top: 32px; /* space for info bar */
   }
   .ticker {
     display: flex;
@@ -59,6 +74,7 @@ Comment ! followed by number for link to purchase. Example: !20
 </style>
 </head>
 <body>
+<div class="info-bar" id="infoBar">Loading inventory...</div>
 <div class="ticker-wrap">
   <div class="ticker" id="ticker"></div>
 </div>
@@ -93,6 +109,13 @@ Comment ! followed by number for link to purchase. Example: !20
     return result;
   }
 
+  // Parse price string into a number (handles $, commas, etc.)
+  function parsePrice(str) {
+    if (!str) return 0;
+    const cleaned = str.replace(/[^0-9.]/g, '');
+    return parseFloat(cleaned) || 0;
+  }
+
   async function loadProducts() {
     try {
       const res = await fetch(CSV_URL);
@@ -100,30 +123,47 @@ Comment ! followed by number for link to purchase. Example: !20
       const rows = text.trim().split('\n').slice(1); // skip header
 
       const ticker = document.getElementById('ticker');
+      const infoBar = document.getElementById('infoBar');
       let html = '';
+      let inStockCount = 0;
+      let totalValue = 0;
 
       rows.forEach((row, index) => {
         const cols = parseCSVRow(row);
-        // Column C = index 2, Column H = index 7, Column I = index 8
         const name = cols[2]?.trim() || '';
         const price = cols[7]?.trim() || '';
         const status = (cols[8]?.trim() || '').toLowerCase();
-        const lineNumber = index + 2; // start at 2 (header is line 1)
+        const lineNumber = index + 2;
 
         if (name) {
+          const isSoldOut = status === 'sold out';
           let extra = '';
-          if (status === 'sold out') {
+
+          if (isSoldOut) {
             extra = `<span class="soldout-price">${price}</span><span class="soldout">sold out</span>`;
-          } else if (price) {
-            extra = `<span class="price">${price}</span>`;
+          } else {
+            if (price) extra = `<span class="price">${price}</span>`;
+            inStockCount++;
+            totalValue += parsePrice(price);
           }
+
           html += `<div class="item">${lineNumber}. ${name}${extra}</div>`;
         }
       });
 
       ticker.innerHTML = html + html;
+
+      // Update info bar
+      const formattedValue = totalValue.toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 0
+      });
+      infoBar.textContent = `${inStockCount} ITEMS - ${formattedValue} - CHAT !# TO BUY`;
+
     } catch (e) {
       document.getElementById('ticker').innerHTML = '<div class="item">Error loading products</div>';
+      document.getElementById('infoBar').textContent = 'Error loading inventory';
     }
   }
 
@@ -132,3 +172,5 @@ Comment ! followed by number for link to purchase. Example: !20
 </script>
 </body>
 </html>
+
+The ticker content starts below the bar so nothing gets covered.
