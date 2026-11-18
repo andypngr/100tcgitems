@@ -72,7 +72,7 @@
     right: 0;
     background: rgba(0, 0, 0, 0.75);
     color: white;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: bold;
     padding: 6px 8px;
     display: flex;
@@ -89,82 +89,12 @@
     100% { transform: translateY(-50%); }
   }
 
-  /* RIGHT: Shop Scene */
+  /* RIGHT: Blank white space */
   .shop-panel {
     width: 66.667%;
     height: 100%;
-    background: #f5e6c8;
-    position: relative;
-    overflow: hidden;
+    background: white;
   }
-  .floor {
-    position: absolute;
-    inset: 0;
-    background: 
-      linear-gradient(#e0d0b0 1px, transparent 1px),
-      linear-gradient(90deg, #e0d0b0 1px, transparent 1px),
-      #f0e0c0;
-    background-size: 48px 48px;
-  }
-  .wall-back {
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 60px;
-    background: #e8dcc8;
-    border-bottom: 4px solid #d4c4a8;
-  }
-  .wall-left, .wall-right {
-    position: absolute;
-    top: 0; bottom: 0;
-    width: 16px;
-    background: #e8dcc8;
-  }
-  .wall-left { left: 0; }
-  .wall-right { right: 0; }
-  .counter-area {
-    position: absolute;
-    left: 20px; top: 70px;
-    width: 220px; height: 160px;
-    background: #4a4a4a;
-    border: 3px solid #333;
-  }
-  .counter-top {
-    position: absolute;
-    left: 20px; top: 70px;
-    width: 220px; height: 40px;
-    background: #6a6a6a;
-  }
-  .wall-case {
-    position: absolute;
-    left: 280px; top: 50px;
-    width: 420px; height: 110px;
-    background: #2a2a2a;
-    border: 4px solid #111;
-  }
-  .center-case {
-    position: absolute;
-    left: 340px; top: 200px;
-    width: 260px; height: 100px;
-    background: #333;
-    border: 3px solid #111;
-  }
-  .plant {
-    position: absolute;
-    width: 28px; height: 36px;
-    background: #2d6a4f;
-    border-radius: 4px 4px 0 0;
-  }
-  .plant::after {
-    content: '';
-    position: absolute;
-    bottom: -5px; left: 4px; right: 4px;
-    height: 7px;
-    background: #8b5e3c;
-  }
-  .p1 { left: 30px; top: 40px; }
-  .p2 { left: 240px; top: 80px; }
-  .p3 { left: 50px; top: 450px; }
-  .p4 { right: 50px; top: 400px; }
 </style>
 </head>
 <body>
@@ -176,20 +106,7 @@
     </div>
   </div>
 
-  <div class="shop-panel">
-    <div class="floor"></div>
-    <div class="wall-back"></div>
-    <div class="wall-left"></div>
-    <div class="wall-right"></div>
-    <div class="counter-area"></div>
-    <div class="counter-top"></div>
-    <div class="wall-case"></div>
-    <div class="center-case"></div>
-    <div class="plant p1"></div>
-    <div class="plant p2"></div>
-    <div class="plant p3"></div>
-    <div class="plant p4"></div>
-  </div>
+  <div class="shop-panel"></div>
 </div>
 
 <script>
@@ -218,6 +135,13 @@
     return parseFloat(str.replace(/[^0-9.]/g, '')) || 0;
   }
 
+  function formatPrice(str) {
+    if (!str) return '';
+    const num = parsePrice(str);
+    if (num === 0) return str;
+    return '$' + Math.round(num).toLocaleString('en-US');
+  }
+
   function getPlaceholderImage() {
     return 'https://via.placeholder.com/316x534/333333/ffffff?text=Card';
   }
@@ -235,21 +159,22 @@
 
       rows.forEach((row, index) => {
         const cols = parseCSVRow(row);
-        const price = cols[7]?.trim() || '';
+        const rawPrice = cols[7]?.trim() || '';
         const status = (cols[8]?.trim() || '').toLowerCase();
         const lineNumber = index + 2;
         const ebayItemId = cols[EBAY_ITEM_ID_COLUMN]?.trim() || '';
 
-        if (!price && !ebayItemId) return;
+        if (!rawPrice && !ebayItemId) return;
 
         const isSoldOut = status === 'sold out';
+        const displayPrice = formatPrice(rawPrice);
         let priceHtml = '';
         if (isSoldOut) {
-          priceHtml = `<span class="soldout-price">${price}</span><span class="soldout">sold out</span>`;
-        } else if (price) {
-          priceHtml = `<span class="price">${price}</span>`;
+          priceHtml = `<span class="soldout-price">${displayPrice}</span><span class="soldout">sold out</span>`;
+        } else if (rawPrice) {
+          priceHtml = `<span class="price">${displayPrice}</span>`;
           inStockCount++;
-          totalValue += parsePrice(price);
+          totalValue += parsePrice(rawPrice);
         }
 
         const imgSrc = getPlaceholderImage();
