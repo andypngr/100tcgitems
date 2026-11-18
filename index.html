@@ -13,7 +13,7 @@
     width: 100%;
   }
 
-  /* LEFT: Item Feed (1/3) */
+  /* LEFT: Image Feed (1/3) */
   .feed-panel {
     width: 33.333%;
     height: 100%;
@@ -38,37 +38,52 @@
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.7);
-    color: white;
     overflow: hidden;
     padding-top: 32px;
   }
 
   .ticker {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 8px;
     animation: scroll 300s linear infinite;
     width: 100%;
   }
 
-  .item {
-    padding: 8px 16px;
-    font-size: 11px;
-    font-weight: bold;
-    white-space: normal;
-    word-break: break-word;
-    overflow-wrap: anywhere;
-    width: 100%;
+  .card-item {
+    background: rgba(0,0,0,0.6);
+    border-radius: 4px;
+    overflow: hidden;
+    text-align: center;
+    padding-bottom: 6px;
   }
-  .item span.price { color: #4ade80; margin-left: 8px; }
-  .item span.soldout-price { color: #ef4444; margin-left: 8px; text-decoration: line-through; }
-  .item span.soldout { color: #ef4444; margin-left: 4px; text-transform: uppercase; }
+
+  .card-item img {
+    width: 100%;
+    aspect-ratio: 3.16 / 5.34;
+    object-fit: cover;
+    display: block;
+    background: #222;
+  }
+
+  .card-meta {
+    font-size: 10px;
+    font-weight: bold;
+    color: white;
+    padding: 4px 4px 0;
+  }
+
+  .card-meta .price { color: #4ade80; }
+  .card-meta .soldout-price { color: #ef4444; text-decoration: line-through; }
+  .card-meta .soldout { color: #ef4444; margin-left: 4px; text-transform: uppercase; }
 
   @keyframes scroll {
     0% { transform: translateY(0); }
     100% { transform: translateY(-50%); }
   }
 
-  /* RIGHT: Shop Scene */
+  /* RIGHT: Shop Scene (unchanged for now) */
   .shop-panel {
     width: 66.667%;
     height: 100%;
@@ -76,8 +91,6 @@
     position: relative;
     overflow: hidden;
   }
-
-  /* Beige tiled floor */
   .floor {
     position: absolute;
     inset: 0;
@@ -87,8 +100,6 @@
       #f0e0c0;
     background-size: 48px 48px;
   }
-
-  /* Walls */
   .wall-back {
     position: absolute;
     top: 0; left: 0; right: 0;
@@ -104,125 +115,36 @@
   }
   .wall-left { left: 0; }
   .wall-right { right: 0; }
-
-  /* Left counter area */
   .counter-area {
     position: absolute;
-    left: 20px;
-    top: 70px;
-    width: 220px;
-    height: 160px;
+    left: 20px; top: 70px;
+    width: 220px; height: 160px;
     background: #4a4a4a;
     border: 3px solid #333;
   }
   .counter-top {
     position: absolute;
-    left: 20px;
-    top: 70px;
-    width: 220px;
-    height: 40px;
+    left: 20px; top: 70px;
+    width: 220px; height: 40px;
     background: #6a6a6a;
   }
-
-  /* Big back wall display case */
   .wall-case {
     position: absolute;
-    left: 280px;
-    top: 50px;
-    width: 420px;
-    height: 110px;
+    left: 280px; top: 50px;
+    width: 420px; height: 110px;
     background: #2a2a2a;
     border: 4px solid #111;
-    display: flex;
-    flex-wrap: wrap;
-    padding: 6px;
-    gap: 4px;
-    align-content: flex-start;
   }
-  .wall-case .card {
-    width: 28px;
-    height: 36px;
-    background: #ffcc66;
-    border: 1px solid #000;
-  }
-
-  /* Center freestanding case */
   .center-case {
     position: absolute;
-    left: 340px;
-    top: 200px;
-    width: 260px;
-    height: 100px;
+    left: 340px; top: 200px;
+    width: 260px; height: 100px;
     background: #333;
     border: 3px solid #111;
-    display: flex;
-    flex-wrap: wrap;
-    padding: 8px;
-    gap: 4px;
   }
-  .center-case .card {
-    width: 26px;
-    height: 34px;
-    background: #88aaff;
-    border: 1px solid #000;
-  }
-
-  /* Table + chairs */
-  .table {
-    position: absolute;
-    left: 80px;
-    top: 320px;
-    width: 140px;
-    height: 80px;
-    background: #8b5e3c;
-    border: 3px solid #6b4423;
-  }
-  .chair {
-    position: absolute;
-    width: 28px;
-    height: 28px;
-    background: #5a4030;
-    border: 2px solid #3a2818;
-  }
-  .chair-1 { left: 90px; top: 290px; }
-  .chair-2 { left: 140px; top: 290px; }
-  .chair-3 { left: 90px; top: 400px; }
-  .chair-4 { left: 140px; top: 400px; }
-
-  /* Couch area */
-  .couch {
-    position: absolute;
-    right: 40px;
-    top: 340px;
-    width: 160px;
-    height: 50px;
-    background: #d4c4a8;
-    border: 3px solid #b8a888;
-  }
-  .tv-stand {
-    position: absolute;
-    right: 60px;
-    top: 280px;
-    width: 120px;
-    height: 40px;
-    background: #6a5a4a;
-    border: 2px solid #4a3a2a;
-  }
-  .tv {
-    position: absolute;
-    right: 80px;
-    top: 250px;
-    width: 70px;
-    height: 40px;
-    background: #222;
-    border: 2px solid #000;
-  }
-
-  /* Plants */
   .plant {
     position: absolute;
-    width: 28px;
-    height: 36px;
+    width: 28px; height: 36px;
     background: #2d6a4f;
     border-radius: 4px 4px 0 0;
   }
@@ -237,7 +159,6 @@
   .p2 { left: 240px; top: 80px; }
   .p3 { left: 50px; top: 450px; }
   .p4 { right: 50px; top: 400px; }
-  .p5 { left: 300px; top: 180px; }
 </style>
 </head>
 <body>
@@ -254,42 +175,22 @@
     <div class="wall-back"></div>
     <div class="wall-left"></div>
     <div class="wall-right"></div>
-
     <div class="counter-area"></div>
     <div class="counter-top"></div>
-
-    <div class="wall-case">
-      <!-- cards generated by repeating divs -->
-      <div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div>
-      <div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div>
-      <div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div>
-    </div>
-
-    <div class="center-case">
-      <div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div>
-      <div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div>
-    </div>
-
-    <div class="table"></div>
-    <div class="chair chair-1"></div>
-    <div class="chair chair-2"></div>
-    <div class="chair chair-3"></div>
-    <div class="chair chair-4"></div>
-
-    <div class="couch"></div>
-    <div class="tv-stand"></div>
-    <div class="tv"></div>
-
+    <div class="wall-case"></div>
+    <div class="center-case"></div>
     <div class="plant p1"></div>
     <div class="plant p2"></div>
     <div class="plant p3"></div>
     <div class="plant p4"></div>
-    <div class="plant p5"></div>
   </div>
 </div>
 
 <script>
   const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQC0oTQEVVzoNRYrTdZ4LU3yRZZCQugnVwj0_sUUJcUDw4l_DbncBWdWIWZxLvRT5b9j5l_9a0LfA2V/pub?gid=866828695&single=true&output=csv';
+
+  // Column that holds the eBay item ID (update this index if needed)
+  const EBAY_ITEM_ID_COLUMN = 0; // example: column A
 
   function parseCSVRow(row) {
     const result = [];
@@ -312,6 +213,11 @@
     return parseFloat(str.replace(/[^0-9.]/g, '')) || 0;
   }
 
+  // Placeholder image until eBay images are wired up
+  function getPlaceholderImage() {
+    return 'https://via.placeholder.com/316x534/333333/ffffff?text=Card';
+  }
+
   async function loadProducts() {
     try {
       const res = await fetch(CSV_URL);
@@ -325,25 +231,38 @@
 
       rows.forEach((row, index) => {
         const cols = parseCSVRow(row);
-        const name = cols[2]?.trim() || '';
         const price = cols[7]?.trim() || '';
         const status = (cols[8]?.trim() || '').toLowerCase();
         const lineNumber = index + 2;
-        if (!name) return;
+        const ebayItemId = cols[EBAY_ITEM_ID_COLUMN]?.trim() || '';
+
+        if (!price && !ebayItemId) return;
 
         const isSoldOut = status === 'sold out';
-        let extra = '';
+        let priceHtml = '';
         if (isSoldOut) {
-          extra = `<span class="soldout-price">${price}</span><span class="soldout">sold out</span>`;
-        } else {
-          if (price) extra = `<span class="price">${price}</span>`;
+          priceHtml = `<span class="soldout-price">${price}</span><span class="soldout">sold out</span>`;
+        } else if (price) {
+          priceHtml = `<span class="price">${price}</span>`;
           inStockCount++;
           totalValue += parsePrice(price);
         }
-        html += `<div class="item">${lineNumber}. ${name}${extra}</div>`;
+
+        // For now using placeholder. Later replace with eBay image URL.
+        const imgSrc = getPlaceholderImage();
+
+        html += `
+          <div class="card-item">
+            <img src="${imgSrc}" alt="Item ${lineNumber}">
+            <div class="card-meta">
+              #${lineNumber}<br>
+              ${priceHtml}
+            </div>
+          </div>
+        `;
       });
 
-      ticker.innerHTML = html + html;
+      ticker.innerHTML = html + html; // duplicate for seamless loop
       const formattedValue = totalValue.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
       infoBar.textContent = `${inStockCount} ITEMS - ${formattedValue} - CHAT !# TO BUY`;
     } catch (e) {
