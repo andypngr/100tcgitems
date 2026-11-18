@@ -45,18 +45,18 @@
   .ticker {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    padding: 8px;
+    gap: 16px;
+    padding: 16px;
     animation: scroll 300s linear infinite;
     width: 100%;
   }
 
   .card-item {
     background: rgba(0,0,0,0.6);
-    border-radius: 4px;
+    border-radius: 6px;
     overflow: hidden;
     text-align: center;
-    padding-bottom: 6px;
+    padding-bottom: 8px;
   }
 
   .card-item img {
@@ -71,7 +71,7 @@
     font-size: 10px;
     font-weight: bold;
     color: white;
-    padding: 4px 4px 0;
+    padding: 6px 4px 0;
   }
 
   .card-meta .price { color: #4ade80; }
@@ -83,7 +83,7 @@
     100% { transform: translateY(-50%); }
   }
 
-  /* RIGHT: Shop Scene (unchanged for now) */
+  /* RIGHT: Shop Scene */
   .shop-panel {
     width: 66.667%;
     height: 100%;
@@ -189,8 +189,7 @@
 <script>
   const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQC0oTQEVVzoNRYrTdZ4LU3yRZZCQugnVwj0_sUUJcUDw4l_DbncBWdWIWZxLvRT5b9j5l_9a0LfA2V/pub?gid=866828695&single=true&output=csv';
 
-  // Column that holds the eBay item ID (update this index if needed)
-  const EBAY_ITEM_ID_COLUMN = 0; // example: column A
+  const EBAY_ITEM_ID_COLUMN = 0;
 
   function parseCSVRow(row) {
     const result = [];
@@ -213,7 +212,6 @@
     return parseFloat(str.replace(/[^0-9.]/g, '')) || 0;
   }
 
-  // Placeholder image until eBay images are wired up
   function getPlaceholderImage() {
     return 'https://via.placeholder.com/316x534/333333/ffffff?text=Card';
   }
@@ -248,7 +246,6 @@
           totalValue += parsePrice(price);
         }
 
-        // For now using placeholder. Later replace with eBay image URL.
         const imgSrc = getPlaceholderImage();
 
         html += `
@@ -262,7 +259,7 @@
         `;
       });
 
-      ticker.innerHTML = html + html; // duplicate for seamless loop
+      ticker.innerHTML = html + html;
       const formattedValue = totalValue.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
       infoBar.textContent = `${inStockCount} ITEMS - ${formattedValue} - CHAT !# TO BUY`;
     } catch (e) {
