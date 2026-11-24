@@ -13,7 +13,6 @@
     width: 100%;
   }
 
-  /* LEFT: Image Feed (1/3) */
   .feed-panel {
     width: 33.333%;
     height: 100%;
@@ -89,7 +88,6 @@
     100% { transform: translateY(-50%); }
   }
 
-  /* RIGHT: Blank white space */
   .shop-panel {
     width: 66.667%;
     height: 100%;
@@ -105,18 +103,14 @@
       <div class="ticker" id="ticker"></div>
     </div>
   </div>
-
   <div class="shop-panel"></div>
 </div>
 
 <script>
   const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQC0oTQEVVzoNRYrTdZ4LU3yRZZCQugnVwj0_sUUJcUDw4l_DbncBWdWIWZxLvRT5b9j5l_9a0LfA2V/pub?gid=866828695&single=true&output=csv';
 
-  // Column G = index 6
-  const EBAY_ITEM_ID_COLUMN = 6;
-
-  // Paste a short-lived OAuth token here for testing
-  const EBAY_ACCESS_TOKEN = 'YOUR_ACCESS_TOKEN';
+  const EBAY_ITEM_ID_COLUMN = 6;   // Column G
+  const IMAGE_URL_COLUMN = 9;      // Column J
 
   function parseCSVRow(row) {
     const result = [];
@@ -150,27 +144,6 @@
     return 'https://via.placeholder.com/316x534/333333/ffffff?text=Card';
   }
 
-  async function getEbayImage(itemId) {
-    if (!itemId || !EBAY_ACCESS_TOKEN || EBAY_ACCESS_TOKEN === 'v^1.1#i^1#I^3#f^0#r^0#p^1#t^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') {
-      return getPlaceholderImage();
-    }
-    try {
-      const url = `https://api.ebay.com/buy/browse/v1/item/v1|${itemId}|0`;
-      const res = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${EBAY_ACCESS_TOKEN}`,
-          'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
-        }
-      });
-      if (!res.ok) return getPlaceholderImage();
-      const data = await res.json();
-      return data.image?.imageUrl || data.thumbnailImages?.[0]?.imageUrl || getPlaceholderImage();
-    } catch (e) {
-      console.warn('eBay image fetch failed for', itemId, e);
-      return getPlaceholderImage();
-    }
-  }
-
   async function loadProducts() {
     try {
       const res = await fetch(CSV_URL);
@@ -182,14 +155,14 @@
       let inStockCount = 0;
       let totalValue = 0;
 
-      for (const [index, row] of rows.entries()) {
+      rows.forEach((row, index) => {
         const cols = parseCSVRow(row);
         const rawPrice = cols[7]?.trim() || '';
         const status = (cols[8]?.trim() || '').toLowerCase();
         const lineNumber = index + 2;
-        const ebayItemId = cols[EBAY_ITEM_ID_COLUMN]?.trim() || '';
+        const imageUrl = cols[IMAGE_URL_COLUMN]?.trim() || getPlaceholderImage();
 
-        if (!rawPrice && !ebayItemId) continue;
+        if (!rawPrice && !cols[EBAY_ITEM_ID_COLUMN]) return;
 
         const isSoldOut = status === 'sold out';
         const displayPrice = formatPrice(rawPrice);
@@ -202,18 +175,16 @@
           totalValue += parsePrice(rawPrice);
         }
 
-        const imgSrc = await getEbayImage(ebayItemId);
-
         html += `
           <div class="card-item">
-            <img src="${imgSrc}" alt="Item ${lineNumber}">
+            <img src="${imageUrl}" alt="Item ${lineNumber}">
             <div class="card-meta">
               <span>${lineNumber}</span>
               <span>${priceHtml}</span>
             </div>
           </div>
         `;
-      }
+      });
 
       ticker.innerHTML = html + html;
       const formattedValue = totalValue.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
