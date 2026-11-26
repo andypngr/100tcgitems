@@ -36,7 +36,7 @@
   .ticker-wrap {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: #75695f;
+    background: #262626;
     overflow: hidden;
     padding-top: 32px;
   }
@@ -55,7 +55,7 @@
     border-radius: 6px;
     overflow: hidden;
     background: #222;
-    box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.45);
+    box-shadow: 10px 10px 4px rgba(0, 0, 0, 0.6);
   }
 
   .card-item img {
@@ -117,7 +117,6 @@
   #shop-character { z-index: 2; }
   #shop-counter { z-index: 3; }
 
-  /* Speech bubble */
   .speech-bubble {
     position: absolute;
     top: 50%;
@@ -205,7 +204,6 @@
     document.getElementById('shop-character').src = characterMains[charIndex];
   }, 500);
 
-  // ----- Speech bubble -----
   let speechLines = [];
   let speechIndex = 0;
 
@@ -241,7 +239,6 @@
     }, 5000);
   }
 
-  // ----- Inventory -----
   function parseCSVRow(row) {
     const result = [];
     let current = '';
@@ -268,6 +265,18 @@
     const num = parsePrice(str);
     if (num === 0) return str;
     return '$' + Math.round(num).toLocaleString('en-US');
+  }
+
+  function formatTotalValue(value) {
+    if (value < 100000) {
+      return '$' + Math.round(value).toLocaleString('en-US');
+    }
+    if (value >= 1000000) {
+      const millions = Math.floor(value / 100000) / 10;
+      return '$' + (millions % 1 === 0 ? millions.toFixed(0) : millions.toFixed(1)) + 'M+';
+    }
+    const hundredK = Math.floor(value / 100000);
+    return '$' + hundredK + '00K+';
   }
 
   function getPlaceholderImage() {
@@ -349,8 +358,8 @@
       });
 
       ticker.innerHTML = html + html;
-      const formattedValue = totalValue.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
-      infoBar.textContent = `${inStockCount} ITEMS - ${formattedValue} - CHAT !# TO BUY`;
+      const valueDisplay = formatTotalValue(totalValue);
+      infoBar.textContent = `${inStockCount} ITEMS - ${valueDisplay} IN STOCK - CHAT !# TO BUY`;
     } catch (e) {
       console.error(e);
       document.getElementById('infoBar').textContent = 'Error loading inventory';
