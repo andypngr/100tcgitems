@@ -36,7 +36,7 @@
   .ticker-wrap {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: #262626;
+    background: #000;
     overflow: hidden;
     padding-top: 32px;
   }
@@ -55,7 +55,6 @@
     border-radius: 6px;
     overflow: hidden;
     background: #222;
-    box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.25);
   }
 
   .card-item img {
@@ -253,7 +252,9 @@
     bubble.textContent = line.text;
     bubble.classList.add('visible');
 
+    // Expression lasts 5 seconds, then return to main
     setTimeout(() => {
+      setExpression('main');
       bubble.classList.remove('visible');
       setTimeout(() => {
         speechIndex = (speechIndex + 1) % speechLines.length;
@@ -396,4 +397,3 @@
 </script>
 </body>
 </html>
-Each line now switches the character to the matching expression while the text is shown.
