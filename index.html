@@ -13,7 +13,6 @@
     width: 100%;
   }
 
-  /* LEFT: Image Feed */
   .feed-panel {
     width: 33.333%;
     height: 100%;
@@ -89,7 +88,6 @@
     100% { transform: translateY(-50%); }
   }
 
-  /* RIGHT: Shop Design */
   .shop-panel {
     width: 66.667%;
     height: 100%;
@@ -133,9 +131,8 @@
   const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQC0oTQEVVzoNRYrTdZ4LU3yRZZCQugnVwj0_sUUJcUDw4l_DbncBWdWIWZxLvRT5b9j5l_9a0LfA2V/pub?gid=866828695&single=true&output=csv';
   const WORKER_URL = 'https://ebay-image-proxy.andypeninger.workers.dev';
 
-  const EBAY_ITEM_ID_COLUMN = 6; // Column G
+  const EBAY_ITEM_ID_COLUMN = 6;
 
-  // Shop animation
   const shopBases = ['imgs/cardshop1.jpg', 'imgs/cardshop2.jpg', 'imgs/cardshop3.jpg'];
   const characterMains = ['imgs/character_main1.png', 'imgs/character_main2.png'];
   let baseIndex = 0;
@@ -147,9 +144,8 @@
     document.getElementById('shop-base').src = shopBases[baseIndex];
     document.getElementById('shop-character').src = characterMains[charIndex];
   }
-  setInterval(animateShop, 200); // switch every 0.2s
+  setInterval(animateShop, 300); // 0.3 seconds
 
-  // ----- Inventory / Ticker -----
   function parseCSVRow(row) {
     const result = [];
     let current = '';
@@ -201,18 +197,19 @@
       const rows = text.trim().split('\n').slice(1);
       const ticker = document.getElementById('ticker');
       const infoBar = document.getElementById('infoBar');
-      let html = '';
+
+      const items = [];
       let inStockCount = 0;
       let totalValue = 0;
 
-      for (const [index, row] of rows.entries()) {
+      rows.forEach((row, index) => {
         const cols = parseCSVRow(row);
         const rawPrice = cols[7]?.trim() || '';
         const status = (cols[8]?.trim() || '').toLowerCase();
         const lineNumber = index + 2;
         const ebayItemId = cols[EBAY_ITEM_ID_COLUMN]?.trim() || '';
 
-        if (!rawPrice && !ebayItemId) continue;
+        if (!rawPrice && !ebayItemId) return;
 
         const isSoldOut = status === 'sold out';
         const displayPrice = formatPrice(rawPrice);
@@ -225,18 +222,24 @@
           totalValue += parsePrice(rawPrice);
         }
 
-        const imgSrc = await getImageFromWorker(ebayItemId);
+        items.push({ lineNumber, ebayItemId, priceHtml });
+      });
 
+      const imagePromises = items.map(item => getImageFromWorker(item.ebayItemId));
+      const images = await Promise.all(imagePromises);
+
+      let html = '';
+      items.forEach((item, i) => {
         html += `
           <div class="card-item">
-            <img src="${imgSrc}" alt="Item ${lineNumber}">
+            <img src="${images[i]}" alt="Item ${item.lineNumber}">
             <div class="card-meta">
-              <span>${lineNumber}</span>
-              <span>${priceHtml}</span>
+              <span>${item.lineNumber}</span>
+              <span>${item.priceHtml}</span>
             </div>
           </div>
         `;
-      }
+      });
 
       ticker.innerHTML = html + html;
       const formattedValue = totalValue.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
