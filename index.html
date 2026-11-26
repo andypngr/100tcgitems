@@ -71,7 +71,7 @@
     right: 0;
     background: rgba(0, 0, 0, 0.75);
     color: white;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: bold;
     padding: 6px 8px;
     display: flex;
@@ -138,13 +138,15 @@
   let baseIndex = 0;
   let charIndex = 0;
 
-  function animateShop() {
+  setInterval(() => {
     baseIndex = (baseIndex + 1) % shopBases.length;
-    charIndex = (charIndex + 1) % characterMains.length;
     document.getElementById('shop-base').src = shopBases[baseIndex];
+  }, 400);
+
+  setInterval(() => {
+    charIndex = (charIndex + 1) % characterMains.length;
     document.getElementById('shop-character').src = characterMains[charIndex];
-  }
-  setInterval(animateShop, 300); // 0.3 seconds
+  }, 500);
 
   function parseCSVRow(row) {
     const result = [];
