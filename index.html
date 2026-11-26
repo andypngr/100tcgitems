@@ -115,6 +115,37 @@
   #shop-base { z-index: 1; }
   #shop-character { z-index: 2; }
   #shop-counter { z-index: 3; }
+
+  /* Speech bubble */
+  .speech-bubble {
+    position: absolute;
+    top: 12%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    color: #222;
+    font-family: 'Courier New', monospace;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 14px 20px;
+    border-radius: 16px;
+    max-width: 70%;
+    text-align: center;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    line-height: 1.4;
+  }
+
+  .speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 12px 12px 0;
+    border-style: solid;
+    border-color: white transparent transparent transparent;
+  }
 </style>
 </head>
 <body>
@@ -130,11 +161,13 @@
     <img id="shop-base" class="shop-layer" src="imgs/cardshop1.jpg" alt="shop">
     <img id="shop-character" class="shop-layer" src="imgs/character_main1.png" alt="character">
     <img id="shop-counter" class="shop-layer" src="imgs/counter.png" alt="counter">
+    <div class="speech-bubble" id="speechBubble">Loading...</div>
   </div>
 </div>
 
 <script>
   const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQC0oTQEVVzoNRYrTdZ4LU3yRZZCQugnVwj0_sUUJcUDw4l_DbncBWdWIWZxLvRT5b9j5l_9a0LfA2V/pub?gid=866828695&single=true&output=csv';
+  const SPEECH_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQC0oTQEVVzoNRYrTdZ4LU3yRZZCQugnVwj0_sUUJcUDw4l_DbncBWdWIWZxLvRT5b9j5l_9a0LfA2V/pub?gid=1794285275&single=true&output=csv';
   const WORKER_URL = 'https://ebay-image-proxy.andypeninger.workers.dev';
 
   const EBAY_ITEM_ID_COLUMN = 6;
@@ -154,6 +187,36 @@
     document.getElementById('shop-character').src = characterMains[charIndex];
   }, 500);
 
+  // ----- Speech bubble -----
+  let speechLines = [];
+  let speechIndex = 0;
+
+  async function loadSpeech() {
+    try {
+      const res = await fetch(SPEECH_CSV_URL);
+      const text = await res.text();
+      speechLines = text.trim().split('\n')
+        .map(line => line.replace(/^"|"$/g, '').trim())
+        .filter(line => line.length > 0);
+      
+      if (speechLines.length > 0) {
+        showNextSpeech();
+        setInterval(showNextSpeech, 8000); // change line every 8 seconds
+      }
+    } catch (e) {
+      console.error('Speech load failed', e);
+      document.getElementById('speechBubble').textContent = 'Welcome!';
+    }
+  }
+
+  function showNextSpeech() {
+    if (speechLines.length === 0) return;
+    const bubble = document.getElementById('speechBubble');
+    bubble.textContent = speechLines[speechIndex];
+    speechIndex = (speechIndex + 1) % speechLines.length;
+  }
+
+  // ----- Inventory -----
   function parseCSVRow(row) {
     const result = [];
     let current = '';
@@ -269,8 +332,11 @@
     }
   }
 
+  loadSpeech();
   loadProducts();
   setInterval(loadProducts, 120000);
 </script>
 </body>
 </html>
+
+Want the bubble positioned differently, a different cycle speed, or any style tweaks?
