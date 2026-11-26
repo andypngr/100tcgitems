@@ -216,7 +216,6 @@
   let speechLines = [];
   let speechIndex = 0;
   let controlQueue = [];
-  let isPlayingControl = false;
 
   async function loadSpeech() {
     try {
@@ -234,7 +233,7 @@
     try {
       const res = await fetch(CONTROL_CSV_URL);
       const text = await res.text();
-      const rows = text.trim().split('\n').slice(1); // skip header
+      const rows = text.trim().split('\n').slice(1);
 
       controlQueue = [];
       rows.forEach(row => {
@@ -278,33 +277,31 @@
     while (true) {
       await loadControl();
 
+      // Prioritize control lines immediately
       if (controlQueue.length > 0) {
-        isPlayingControl = true;
         for (const item of controlQueue) {
           setExpression(item.expression);
           showBubble(item.text, item.duration);
-          await new Promise(r => setTimeout(r, item.duration + 500));
+          await new Promise(r => setTimeout(r, item.duration + 300));
         }
         setExpression('main');
-        isPlayingControl = false;
-        // small pause before returning to normal lines
-        await new Promise(r => setTimeout(r, 1000));
+        continue;
+      }
+
+      // Otherwise play one normal line
+      if (speechLines.length > 0) {
+        setExpression('main');
+        const line = speechLines[speechIndex];
+        showBubble(line, 5000);
+        speechIndex = (speechIndex + 1) % speechLines.length;
+        await new Promise(r => setTimeout(r, 10000));
       } else {
-        // Normal speech lines
-        if (speechLines.length > 0) {
-          setExpression('main');
-          const line = speechLines[speechIndex];
-          showBubble(line, 5000);
-          speechIndex = (speechIndex + 1) % speechLines.length;
-          await new Promise(r => setTimeout(r, 10000)); // 5s show + 5s gap
-        } else {
-          await new Promise(r => setTimeout(r, 3000));
-        }
+        await new Promise(r => setTimeout(r, 2000));
       }
     }
   }
 
-  // ----- Inventory (unchanged) -----
+  // ----- Inventory -----
   function parseCSVRow(row) {
     const result = [];
     let current = '';
