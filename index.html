@@ -185,14 +185,21 @@
 <script>
   const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQC0oTQEVVzoNRYrTdZ4LU3yRZZCQugnVwj0_sUUJcUDw4l_DbncBWdWIWZxLvRT5b9j5l_9a0LfA2V/pub?gid=866828695&single=true&output=csv';
   const SPEECH_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQC0oTQEVVzoNRYrTdZ4LU3yRZZCQugnVwj0_sUUJcUDw4l_DbncBWdWIWZxLvRT5b9j5l_9a0LfA2V/pub?gid=1794285275&single=true&output=csv';
+  const CONTROL_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQC0oTQEVVzoNRYrTdZ4LU3yRZZCQugnVwj0_sUUJcUDw4l_DbncBWdWIWZxLvRT5b9j5l_9a0LfA2V/pub?gid=1203563980&single=true&output=csv';
   const WORKER_URL = 'https://ebay-image-proxy.andypeninger.workers.dev';
 
   const EBAY_ITEM_ID_COLUMN = 6;
 
   const shopBases = ['imgs/cardshop1.jpg', 'imgs/cardshop2.jpg', 'imgs/cardshop3.jpg'];
-  const characterMains = ['imgs/character_main1.png', 'imgs/character_main2.png'];
+  const expressions = {
+    main: ['imgs/character_main1.png', 'imgs/character_main2.png'],
+    wow: ['imgs/character_wow1.png', 'imgs/character_wow2.png'],
+    wave: ['imgs/character_wave1.png', 'imgs/character_wave2.png']
+  };
+
   let baseIndex = 0;
   let charIndex = 0;
+  let currentExpression = 'main';
 
   setInterval(() => {
     baseIndex = (baseIndex + 1) % shopBases.length;
@@ -200,12 +207,16 @@
   }, 400);
 
   setInterval(() => {
-    charIndex = (charIndex + 1) % characterMains.length;
-    document.getElementById('shop-character').src = characterMains[charIndex];
+    const frames = expressions[currentExpression] || expressions.main;
+    charIndex = (charIndex + 1) % frames.length;
+    document.getElementById('shop-character').src = frames[charIndex];
   }, 500);
 
+  // ----- Speech + Control -----
   let speechLines = [];
   let speechIndex = 0;
+  let controlQueue = [];
+  let isPlayingControl = false;
 
   async function loadSpeech() {
     try {
@@ -214,31 +225,86 @@
       speechLines = text.trim().split('\n')
         .map(line => line.replace(/^"|"$/g, '').trim())
         .filter(line => line.length > 0);
-      
-      if (speechLines.length > 0) {
-        cycleSpeech();
-      }
     } catch (e) {
       console.error('Speech load failed', e);
     }
   }
 
-  function cycleSpeech() {
-    if (speechLines.length === 0) return;
+  async function loadControl() {
+    try {
+      const res = await fetch(CONTROL_CSV_URL);
+      const text = await res.text();
+      const rows = text.trim().split('\n').slice(1); // skip header
 
-    const bubble = document.getElementById('speechBubble');
-    bubble.textContent = speechLines[speechIndex];
-    bubble.classList.add('visible');
+      controlQueue = [];
+      rows.forEach(row => {
+        const cols = parseCSVRow(row);
+        const expression = (cols[0] || '').trim().toLowerCase();
+        const text = (cols[1] || '').trim();
+        const duration = parseInt(cols[2]) || 5;
 
-    setTimeout(() => {
-      bubble.classList.remove('visible');
-      setTimeout(() => {
-        speechIndex = (speechIndex + 1) % speechLines.length;
-        cycleSpeech();
-      }, 5000);
-    }, 5000);
+        if (expression || text) {
+          controlQueue.push({
+            expression: expression || 'main',
+            text: text,
+            duration: duration * 1000
+          });
+        }
+      });
+    } catch (e) {
+      console.error('Control load failed', e);
+    }
   }
 
+  function setExpression(expr) {
+    currentExpression = expressions[expr] ? expr : 'main';
+    charIndex = 0;
+    const frames = expressions[currentExpression];
+    document.getElementById('shop-character').src = frames[0];
+  }
+
+  function showBubble(text, duration) {
+    const bubble = document.getElementById('speechBubble');
+    if (!text) {
+      bubble.classList.remove('visible');
+      return;
+    }
+    bubble.textContent = text;
+    bubble.classList.add('visible');
+    setTimeout(() => bubble.classList.remove('visible'), duration);
+  }
+
+  async function runSpeechCycle() {
+    while (true) {
+      await loadControl();
+
+      if (controlQueue.length > 0) {
+        isPlayingControl = true;
+        for (const item of controlQueue) {
+          setExpression(item.expression);
+          showBubble(item.text, item.duration);
+          await new Promise(r => setTimeout(r, item.duration + 500));
+        }
+        setExpression('main');
+        isPlayingControl = false;
+        // small pause before returning to normal lines
+        await new Promise(r => setTimeout(r, 1000));
+      } else {
+        // Normal speech lines
+        if (speechLines.length > 0) {
+          setExpression('main');
+          const line = speechLines[speechIndex];
+          showBubble(line, 5000);
+          speechIndex = (speechIndex + 1) % speechLines.length;
+          await new Promise(r => setTimeout(r, 10000)); // 5s show + 5s gap
+        } else {
+          await new Promise(r => setTimeout(r, 3000));
+        }
+      }
+    }
+  }
+
+  // ----- Inventory (unchanged) -----
   function parseCSVRow(row) {
     const result = [];
     let current = '';
@@ -366,7 +432,8 @@
     }
   }
 
-  loadSpeech();
+  // Start everything
+  loadSpeech().then(() => runSpeechCycle());
   loadProducts();
   setInterval(loadProducts, 120000);
 </script>
