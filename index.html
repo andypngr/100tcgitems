@@ -79,13 +79,15 @@
     align-items: center;
   }
 
-  .card-meta.soldout {
+  .card-meta.soldout,
+  .card-meta.soon {
     justify-content: center;
   }
 
   .card-meta .price { color: #4ade80; }
   .card-meta .soldout-price { color: #ef4444; text-decoration: line-through; }
   .card-meta .soldout { color: #ef4444; margin-left: 4px; text-transform: uppercase; }
+  .card-meta .soon { color: #facc15; text-transform: uppercase; }
 
   @keyframes scroll {
     0% { transform: translateY(0); }
@@ -218,17 +220,28 @@
         if (!rawPrice && !ebayItemId) return;
 
         const isSoldOut = status === 'sold out';
+        const isSoon = status === 'soon';
         const displayPrice = formatPrice(rawPrice);
+
         let priceHtml = '';
-        if (isSoldOut) {
+        let metaClass = 'card-meta';
+        let numberHtml = `<span>${lineNumber}</span>`;
+
+        if (isSoon) {
+          priceHtml = `<span class="soon">COMING SOON!</span>`;
+          metaClass = 'card-meta soon';
+          numberHtml = '';
+        } else if (isSoldOut) {
           priceHtml = `<span class="soldout-price">${displayPrice}</span><span class="soldout">sold out</span>`;
+          metaClass = 'card-meta soldout';
+          numberHtml = '';
         } else if (rawPrice) {
           priceHtml = `<span class="price">${displayPrice}</span>`;
           inStockCount++;
           totalValue += parsePrice(rawPrice);
         }
 
-        items.push({ lineNumber, ebayItemId, priceHtml, isSoldOut });
+        items.push({ lineNumber, ebayItemId, priceHtml, metaClass, numberHtml });
       });
 
       const imagePromises = items.map(item => getImageFromWorker(item.ebayItemId));
@@ -236,14 +249,11 @@
 
       let html = '';
       items.forEach((item, i) => {
-        const metaClass = item.isSoldOut ? 'card-meta soldout' : 'card-meta';
-        const numberHtml = item.isSoldOut ? '' : `<span>${item.lineNumber}</span>`;
-
         html += `
           <div class="card-item">
             <img src="${images[i]}" alt="Item ${item.lineNumber}">
-            <div class="${metaClass}">
-              ${numberHtml}
+            <div class="${item.metaClass}">
+              ${item.numberHtml}
               <span>${item.priceHtml}</span>
             </div>
           </div>
