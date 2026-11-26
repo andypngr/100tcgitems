@@ -36,7 +36,7 @@
   .ticker-wrap {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.7);
+    background: #75695f;
     overflow: hidden;
     padding-top: 32px;
   }
@@ -55,6 +55,7 @@
     border-radius: 6px;
     overflow: hidden;
     background: #222;
+    box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.45);
   }
 
   .card-item img {
@@ -231,10 +232,8 @@
     bubble.textContent = speechLines[speechIndex];
     bubble.classList.add('visible');
 
-    // Show for 5 seconds
     setTimeout(() => {
       bubble.classList.remove('visible');
-      // Wait 5 seconds of nothing, then next line
       setTimeout(() => {
         speechIndex = (speechIndex + 1) % speechLines.length;
         cycleSpeech();
