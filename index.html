@@ -119,8 +119,9 @@
   /* Speech bubble */
   .speech-bubble {
     position: absolute;
-    top: 18%;
-    left: 8%;
+    top: 50%;
+    left: 25%;
+    transform: translateY(-50%);
     background: rgba(255, 255, 255, 0.92);
     color: #222;
     font-family: 'Courier New', monospace;
@@ -128,7 +129,7 @@
     font-weight: bold;
     padding: 14px 20px;
     border-radius: 16px;
-    max-width: 55%;
+    max-width: 50%;
     text-align: left;
     z-index: 10;
     border: 5px solid #d1d5db;
@@ -230,7 +231,7 @@
     bubble.textContent = speechLines[speechIndex];
     bubble.classList.add('visible');
 
-    // Show for 3 seconds
+    // Show for 5 seconds
     setTimeout(() => {
       bubble.classList.remove('visible');
       // Wait 5 seconds of nothing, then next line
@@ -238,7 +239,7 @@
         speechIndex = (speechIndex + 1) % speechLines.length;
         cycleSpeech();
       }, 5000);
-    }, 3000);
+    }, 5000);
   }
 
   // ----- Inventory -----
