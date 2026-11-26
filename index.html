@@ -13,6 +13,7 @@
     width: 100%;
   }
 
+  /* LEFT: Image Feed */
   .feed-panel {
     width: 33.333%;
     height: 100%;
@@ -88,11 +89,28 @@
     100% { transform: translateY(-50%); }
   }
 
+  /* RIGHT: Shop Design */
   .shop-panel {
     width: 66.667%;
     height: 100%;
-    background: white;
+    position: relative;
+    overflow: hidden;
+    background: #111;
   }
+
+  .shop-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+  }
+
+  #shop-base { z-index: 1; }
+  #shop-character { z-index: 2; }
+  #shop-counter { z-index: 3; }
 </style>
 </head>
 <body>
@@ -103,7 +121,12 @@
       <div class="ticker" id="ticker"></div>
     </div>
   </div>
-  <div class="shop-panel"></div>
+
+  <div class="shop-panel">
+    <img id="shop-base" class="shop-layer" src="imgs/cardshop1.jpg" alt="shop">
+    <img id="shop-character" class="shop-layer" src="imgs/character_main1.png" alt="character">
+    <img id="shop-counter" class="shop-layer" src="imgs/counter.png" alt="counter">
+  </div>
 </div>
 
 <script>
@@ -112,6 +135,21 @@
 
   const EBAY_ITEM_ID_COLUMN = 6; // Column G
 
+  // Shop animation
+  const shopBases = ['imgs/cardshop1.jpg', 'imgs/cardshop2.jpg', 'imgs/cardshop3.jpg'];
+  const characterMains = ['imgs/character_main1.png', 'imgs/character_main2.png'];
+  let baseIndex = 0;
+  let charIndex = 0;
+
+  function animateShop() {
+    baseIndex = (baseIndex + 1) % shopBases.length;
+    charIndex = (charIndex + 1) % characterMains.length;
+    document.getElementById('shop-base').src = shopBases[baseIndex];
+    document.getElementById('shop-character').src = characterMains[charIndex];
+  }
+  setInterval(animateShop, 1800); // switch every 1.8s for gentle movement
+
+  // ----- Inventory / Ticker -----
   function parseCSVRow(row) {
     const result = [];
     let current = '';
