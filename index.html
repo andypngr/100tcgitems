@@ -119,32 +119,48 @@
   /* Speech bubble */
   .speech-bubble {
     position: absolute;
-    top: 12%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: white;
+    top: 18%;
+    left: 8%;
+    background: rgba(255, 255, 255, 0.92);
     color: #222;
     font-family: 'Courier New', monospace;
     font-size: 18px;
     font-weight: bold;
     padding: 14px 20px;
     border-radius: 16px;
-    max-width: 70%;
-    text-align: center;
+    max-width: 55%;
+    text-align: left;
     z-index: 10;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    border: 5px solid #d1d5db;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     line-height: 1.4;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+
+  .speech-bubble.visible {
+    opacity: 1;
   }
 
   .speech-bubble::after {
     content: '';
     position: absolute;
-    bottom: -12px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 12px 12px 0;
+    bottom: 18px;
+    left: -18px;
+    border-width: 10px 18px 10px 0;
     border-style: solid;
-    border-color: white transparent transparent transparent;
+    border-color: transparent #d1d5db transparent transparent;
+  }
+
+  .speech-bubble::before {
+    content: '';
+    position: absolute;
+    bottom: 20px;
+    left: -12px;
+    border-width: 8px 14px 8px 0;
+    border-style: solid;
+    border-color: transparent rgba(255,255,255,0.92) transparent transparent;
+    z-index: 1;
   }
 </style>
 </head>
@@ -161,7 +177,7 @@
     <img id="shop-base" class="shop-layer" src="imgs/cardshop1.jpg" alt="shop">
     <img id="shop-character" class="shop-layer" src="imgs/character_main1.png" alt="character">
     <img id="shop-counter" class="shop-layer" src="imgs/counter.png" alt="counter">
-    <div class="speech-bubble" id="speechBubble">Loading...</div>
+    <div class="speech-bubble" id="speechBubble"></div>
   </div>
 </div>
 
@@ -200,20 +216,29 @@
         .filter(line => line.length > 0);
       
       if (speechLines.length > 0) {
-        showNextSpeech();
-        setInterval(showNextSpeech, 8000); // change line every 8 seconds
+        cycleSpeech();
       }
     } catch (e) {
       console.error('Speech load failed', e);
-      document.getElementById('speechBubble').textContent = 'Welcome!';
     }
   }
 
-  function showNextSpeech() {
+  function cycleSpeech() {
     if (speechLines.length === 0) return;
+
     const bubble = document.getElementById('speechBubble');
     bubble.textContent = speechLines[speechIndex];
-    speechIndex = (speechIndex + 1) % speechLines.length;
+    bubble.classList.add('visible');
+
+    // Show for 3 seconds
+    setTimeout(() => {
+      bubble.classList.remove('visible');
+      // Wait 5 seconds of nothing, then next line
+      setTimeout(() => {
+        speechIndex = (speechIndex + 1) % speechLines.length;
+        cycleSpeech();
+      }, 5000);
+    }, 3000);
   }
 
   // ----- Inventory -----
@@ -338,5 +363,3 @@
 </script>
 </body>
 </html>
-
-Want the bubble positioned differently, a different cycle speed, or any style tweaks?
