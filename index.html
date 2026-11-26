@@ -71,12 +71,16 @@
     right: 0;
     background: rgba(0, 0, 0, 0.75);
     color: white;
-    font-size: 16px;
+    font-size: 20px;
     font-weight: bold;
     padding: 6px 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+  }
+
+  .card-meta.soldout {
+    justify-content: center;
   }
 
   .card-meta .price { color: #4ade80; }
@@ -224,7 +228,7 @@
           totalValue += parsePrice(rawPrice);
         }
 
-        items.push({ lineNumber, ebayItemId, priceHtml });
+        items.push({ lineNumber, ebayItemId, priceHtml, isSoldOut });
       });
 
       const imagePromises = items.map(item => getImageFromWorker(item.ebayItemId));
@@ -232,11 +236,14 @@
 
       let html = '';
       items.forEach((item, i) => {
+        const metaClass = item.isSoldOut ? 'card-meta soldout' : 'card-meta';
+        const numberHtml = item.isSoldOut ? '' : `<span>${item.lineNumber}</span>`;
+
         html += `
           <div class="card-item">
             <img src="${images[i]}" alt="Item ${item.lineNumber}">
-            <div class="card-meta">
-              <span>${item.lineNumber}</span>
+            <div class="${metaClass}">
+              ${numberHtml}
               <span>${item.priceHtml}</span>
             </div>
           </div>
